@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
-
-	"inventory-system/pkg/db"
-	"inventory-system/pkg/models"
+	"inventory-system/db"
+	"inventory-system/models"
+	"inventory-system/routes"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -12,23 +11,31 @@ import (
 )
 
 func main() {
-	conn := db.SetupConn()
-	conn.AutoMigrate(models.User{}, models.Product{})
+	database := db.SetupConn()
+	database.AutoMigrate(models.User{}, models.Product{})
+
+	user_rt := routes.User{
+		Conn: database,
+	}
 
 	app := echo.New()
 	app.Use(middleware.Logger())
 	app.Use(middleware.Recover())
 
-	app.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, world")
-	})
+	app.GET("/", MainRoute)
 
-	user := app.Group("/user", middleware.JWT(func(key string) {
-		fmt.Println(key)
-	}))
-	user.GET("/:id", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello!")
-	})
+	user_gr := app.Group("/user")
+	{
+		user_gr.GET("", user_rt.GetAll)
+		user_gr.POST("", user_rt.CreateOne)
+		user_gr.GET("/:id", user_rt.GetOne)
+		user_gr.PUT("/:id", user_rt.UpdateOne)
+		user_gr.DELETE("/:id", user_rt.DeleteOne)
+	}
 
 	app.Logger.Fatal(app.Start(":8000"))
+}
+
+func MainRoute(c echo.Context) error {
+	return c.String(http.StatusOK, "Inventory Management System.")
 }
