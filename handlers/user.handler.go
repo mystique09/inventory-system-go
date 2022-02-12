@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"inventory-system/models"
 
 	"github.com/google/uuid"
@@ -25,7 +24,30 @@ func GetUser(conn *gorm.DB, id uuid.UUID) models.UserResponse {
 func CreateUser(conn *gorm.DB, payload models.CreateUserDto) error {
 	new_user := models.NewUser(&payload)
 	if err := conn.Create(&new_user).Error; err != nil {
-		return errors.New(err.Error())
+		return err
+	}
+	return nil
+}
+
+func UpdateUser(conn *gorm.DB, uid uuid.UUID, payload models.UpdateUserDto) error {
+	var user models.User
+	err := conn.Model(&user).
+		Where("id = ?", uid).
+		Updates(payload).
+		Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteUser(conn *gorm.DB, uid uuid.UUID) error {
+	var deleted_user models.User
+
+	if err := conn.Delete(&deleted_user, "id = ?", uid).Error; err != nil {
+		return err
 	}
 	return nil
 }
