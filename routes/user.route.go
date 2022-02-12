@@ -1,10 +1,12 @@
 package routes
 
 import (
+	"fmt"
 	"inventory-system/handlers"
 	"inventory-system/models"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -20,14 +22,26 @@ func (rt *User) GetAll(c echo.Context) error {
 }
 
 func (rt *User) GetOne(c echo.Context) error {
-	return c.String(http.StatusOK, "Get user by id.")
+	uid, uuidparse_err := uuid.Parse(c.Param("id"))
+
+	if uuidparse_err != nil {
+		return c.JSON(http.StatusBadRequest, uuidparse_err.Error())
+	}
+
+	var result models.UserResponse = handlers.GetUser(rt.Conn, uid)
+
+	if result.Username == "" {
+		return c.JSON(http.StatusBadRequest, fmt.Sprintf("User with id %s doesn't exist.", uid))
+	}
+
+	return c.JSON(http.StatusOK, result)
 }
 
 func (rt *User) CreateOne(c echo.Context) error {
 	payload := new(models.CreateUserDto)
 
-	if err := (&echo.DefaultBinder{}).BindBody(c, &payload); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+	if err := (&echo.DefaultBinder{}).BindBody(c, &payload).Error(); err != "" {
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	if payload.Username == "" || payload.Email == "" || payload.Password == "" {
@@ -49,9 +63,33 @@ func (rt *User) CreateOne(c echo.Context) error {
 }
 
 func (rt *User) UpdateOne(c echo.Context) error {
-	return c.String(http.StatusOK, "Update one")
+	payload := new(models.UpdateUserDto)
+	uid, uuidparse_err := uuid.Parse(c.Param("id"))
+
+	if uuidparse_err != nil {
+		return c.JSON(http.StatusBadRequest, uuidparse_err.Error())
+	}
+
+	if err := (&echo.DefaultBinder{}).BindBody(c, &payload).Error(); err != "" {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	if err := handlers.UpdateUser(rt.Conn, uid, *payload); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "User updated.")
 }
 
 func (rt *User) DeleteOne(c echo.Context) error {
-	return c.String(http.StatusOK, "Delete one.")
+	uid, uuidparse_err := uuid.Parse(c.Param("id"))
+	if uuidparse_err != nil {
+		return c.JSON(http.StatusBadRequest, uuidparse_err.Error())
+	}
+
+	if err := handlers.DeleteUser(rt.Conn, uid); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "User deleted.")
 }
