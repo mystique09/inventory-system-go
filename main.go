@@ -13,13 +13,11 @@ import (
 func main() {
 	database := db.SetupConn()
 	database.AutoMigrate(models.User{}, models.Product{})
+	user_rt := routes.User{}
+	user_rt.InitDb(database)
 
-	user_rt := routes.User{
-		Conn: database,
-	}
-	product_rt := routes.Product{
-		Conn: database,
-	}
+	product_rt := routes.Product{}
+	product_rt.InitDb(database)
 
 	app := echo.New()
 	app.Use(middleware.Logger())

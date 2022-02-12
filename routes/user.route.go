@@ -15,6 +15,10 @@ type User struct {
 	Conn *gorm.DB
 }
 
+func (rt *User) InitDb(conn *gorm.DB) {
+	rt.Conn = conn
+}
+
 func (rt *User) GetAll(c echo.Context) error {
 	var results []models.UserResponse = handlers.GetUsers(rt.Conn)
 

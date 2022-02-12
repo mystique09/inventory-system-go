@@ -13,6 +13,10 @@ type (
 	}
 )
 
+func (rt *Product) InitDb(conn *gorm.DB) {
+	rt.Conn = conn
+}
+
 func (rt *Product) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, "GetAll product.")
 }
