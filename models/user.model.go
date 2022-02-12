@@ -27,7 +27,6 @@ type (
 		Username string
 		Password string
 		Email    string
-		Role     string
 	}
 
 	UserResponse struct {
