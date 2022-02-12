@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	// ThThe product model.
+	// The product model.
 	Product struct {
 		gorm.Model
 		Name     string    `json:"product_name"`
@@ -19,7 +19,7 @@ type (
 	}
 
 	// The product DTO, use for request binding
-	// when creatint new Product.
+	// when creating new Product.
 	CreateProductDto struct {
 		Name     string
 		Image    string

@@ -17,6 +17,9 @@ func main() {
 	user_rt := routes.User{
 		Conn: database,
 	}
+	product_rt := routes.Product{
+		Conn: database,
+	}
 
 	app := echo.New()
 	app.Use(middleware.Logger())
@@ -31,6 +34,15 @@ func main() {
 		user_gr.GET("/:id", user_rt.GetOne)
 		user_gr.PUT("/:id", user_rt.UpdateOne)
 		user_gr.DELETE("/:id", user_rt.DeleteOne)
+	}
+
+	product_gr := app.Group("/product")
+	{
+		product_gr.GET("", product_rt.GetAll)
+		product_gr.POST("", product_rt.CreateOne)
+		product_gr.GET("/:id", product_rt.GetOne)
+		product_gr.PUT("/:id", product_rt.UpdateOne)
+		product_gr.DELETE("/:id", product_rt.DeleteOne)
 	}
 
 	app.Logger.Fatal(app.Start(":8000"))
