@@ -44,7 +44,7 @@ func (rt *User) GetOne(c echo.Context) error {
 func (rt *User) CreateOne(c echo.Context) error {
 	payload := new(models.CreateUserDto)
 
-	if err := (&echo.DefaultBinder{}).BindBody(c, &payload).Error(); err != "" {
+	if err := (&echo.DefaultBinder{}).BindBody(c, &payload); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -74,7 +74,7 @@ func (rt *User) UpdateOne(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, uuidparse_err.Error())
 	}
 
-	if err := (&echo.DefaultBinder{}).BindBody(c, &payload).Error(); err != "" {
+	if err := (&echo.DefaultBinder{}).BindBody(c, &payload); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
