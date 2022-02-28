@@ -31,15 +31,29 @@ func CreateUser(conn *gorm.DB, payload models.CreateUserDto) error {
 	return nil
 }
 
-func UpdateUser(conn *gorm.DB, uid uuid.UUID, payload models.UpdateUserDto) error {
+func UpdateUser(conn *gorm.DB, uid uuid.UUID, payload models.UpdateUserDto, field string) error {
 	var user models.User
-	err := conn.Model(&user).
-		Where("id = ?", uid).
-		Updates(payload).
-		Error
 
-	if err != nil {
-		return err
+	switch field {
+	case "username":
+		err := conn.Model(&user).Where("id = ?", uid).Update("username", payload.Username).Error
+		if err != nil {
+			return err
+		}
+	case "password":
+		err := conn.Model(&user).Where("id = ?", uid).Update("password", payload.Password).Error
+
+		if err != nil {
+			return err
+		}
+
+	case "email":
+		err := conn.Model(&user).Where("id = ?", uid).Update("email", payload.Email).Error
+
+		if err != nil {
+			return err
+		}
+
 	}
 
 	return nil
