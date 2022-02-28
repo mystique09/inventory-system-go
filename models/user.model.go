@@ -18,15 +18,15 @@ type (
 	}
 
 	CreateUserDto struct {
-		Username string
-		Password string
-		Email    string
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
 	}
 
 	UpdateUserDto struct {
-		Username string
-		Password string
-		Email    string
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
 	}
 
 	UserResponse struct {
