@@ -2,44 +2,43 @@ package models
 
 import (
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type (
 	// The product model.
 	Product struct {
-		gorm.Model
-		Name     string    `json:"product_name"`
-		Image    string    `json:"product_image"`
-		Brand    string    `json:"product_brand"`
-		Price    uint32    `json:"product_price"`
-		Category string    `json:"product_category"`
-		Owner    uuid.UUID `json:"product_owner"`
-		Stock    uint32    `json:"product_stock"`
+		ID       uuid.UUID `json:"id"`
+		Name     string    `json:"name"`
+		Image    string    `json:"image"`
+		Brand    string    `json:"brand"`
+		Price    uint32    `json:"price"`
+		Category string    `json:"category"`
+		Owner    uuid.UUID `json:"owner"`
+		Stock    uint32    `json:"stock"`
 	}
 
 	// The product DTO, use for request binding
 	// when creating new Product.
 	CreateProductDto struct {
-		Name     string
-		Image    string
-		Brand    string
-		Price    uint32
-		Category string
-		Owner    uuid.UUID
-		Stock    uint32
+		Name     string    `json:"name"`
+		Image    string    `json:"image"`
+		Brand    string    `json:"brand"`
+		Price    uint32    `json:"price"`
+		Category string    `json:"category"`
+		Owner    uuid.UUID `json:"owner"`
+		Stock    uint32    `json:"stock"`
 	}
 
 	// Use for updating existing Product.
 	UpdateProductDto struct {
-		Name  string
-		Brand string
-		Price string
-		Stock uint32
+		Name  string `json:"name"`
+		Brand string `json:"brand"`
+		Price uint32 `json:"price"`
+		Stock uint32 `json:"stock"`
 	}
 )
 
-func (*Product) New(payload CreateProductDto) Product {
+func NewProduct(payload CreateProductDto) Product {
 	default_image := "https://default-image-url.com"
 
 	if payload.Image == "" {
@@ -47,6 +46,7 @@ func (*Product) New(payload CreateProductDto) Product {
 	}
 
 	new_product := Product{
+		ID:       uuid.New(),
 		Name:     payload.Name,
 		Image:    payload.Image,
 		Brand:    payload.Brand,
