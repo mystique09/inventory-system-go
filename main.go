@@ -20,12 +20,12 @@ func main() {
 	product_rt.InitDb(database)
 
 	app := echo.New()
-	app.Use(middleware.Logger())
+	app.Use(routes.CustomLogger())
 	app.Use(middleware.Recover())
 
 	app.GET("/", MainRoute)
 
-	user_gr := app.Group("/user")
+	user_gr := app.Group("/users")
 	{
 		user_gr.GET("", user_rt.GetAll)
 		user_gr.POST("", user_rt.CreateOne)
@@ -34,7 +34,7 @@ func main() {
 		user_gr.DELETE("/:id", user_rt.DeleteOne)
 	}
 
-	product_gr := app.Group("/product")
+	product_gr := app.Group("/products")
 	{
 		product_gr.GET("", product_rt.GetAll)
 		product_gr.POST("", product_rt.CreateOne)
