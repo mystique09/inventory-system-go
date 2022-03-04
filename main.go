@@ -30,7 +30,7 @@ func main() {
 		user_gr.GET("", user_rt.GetAll)
 		user_gr.POST("", user_rt.CreateOne)
 		user_gr.GET("/:id", user_rt.GetOne)
-		user_gr.PUT("/:id?:field", user_rt.UpdateOne)
+		user_gr.PUT("/:id", user_rt.UpdateOne)
 		user_gr.DELETE("/:id", user_rt.DeleteOne)
 	}
 

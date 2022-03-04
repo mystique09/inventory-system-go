@@ -69,11 +69,6 @@ func (rt *User) CreateOne(c echo.Context) error {
 func (rt *User) UpdateOne(c echo.Context) error {
 	payload := new(models.UpdateUserDto)
 	uid, uuidparse_err := uuid.Parse(c.Param("id"))
-	field := c.QueryParam("field")
-
-	if field == "" {
-		return c.JSON(http.StatusBadRequest, "Missing query field.")
-	}
 
 	if uuidparse_err != nil {
 		return c.JSON(http.StatusBadRequest, uuidparse_err.Error())
@@ -83,7 +78,7 @@ func (rt *User) UpdateOne(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	if err := handlers.UpdateUser(rt.Conn, uid, *payload, field); err != nil {
+	if err := handlers.UpdateUser(rt.Conn, uid, *payload); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
