@@ -10,3 +10,9 @@ func CustomLogger() echo.MiddlewareFunc {
 		Format: `[${time_rfc3339}] ${status} /${method} ${host}${path} ${latency_human}` + "\n",
 	})
 }
+
+func JwtMiddleware() echo.MiddlewareFunc {
+	return middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: "",
+	})
+}
