@@ -33,13 +33,13 @@ func GetUserByUsername(conn *gorm.DB, payload *models.ULoginPayload) models.User
 
 func CreateUser(conn *gorm.DB, payload models.CreateUserDto) error {
 	new_user := models.NewUser(&payload)
-	hashed_pass, err := bcrypt.GenerateFromPassword([]byte(new_user.Password), bcrypt.DefaultCost)
+	hashed_password, err := bcrypt.GenerateFromPassword([]byte(new_user.Password), bcrypt.DefaultCost)
 
 	if err != nil {
 		return err
 	}
 
-	new_user.Password = string(hashed_pass)
+	new_user.Password = string(hashed_password)
 
 	if err := conn.Create(&new_user).Error; err != nil {
 		return err
