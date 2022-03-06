@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"inventory-system/handlers"
 	"inventory-system/models"
+	"inventory-system/utils"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -63,17 +65,13 @@ func (rt *User) CreateOne(c echo.Context) error {
 	if err := handlers.CreateUser(rt.Conn, *payload); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
+
 	return c.JSON(http.StatusCreated, "New user created.")
 }
 
 func (rt *User) UpdateOne(c echo.Context) error {
 	payload := new(models.UpdateUserDto)
 	uid, uuidparse_err := uuid.Parse(c.Param("id"))
-	field := c.QueryParam("field")
-
-	if field == "" {
-		return c.JSON(http.StatusBadRequest, "Missing query field.")
-	}
 
 	if uuidparse_err != nil {
 		return c.JSON(http.StatusBadRequest, uuidparse_err.Error())
@@ -83,7 +81,7 @@ func (rt *User) UpdateOne(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	if err := handlers.UpdateUser(rt.Conn, uid, *payload, field); err != nil {
+	if err := handlers.UpdateUser(rt.Conn, uid, *payload); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
@@ -101,4 +99,42 @@ func (rt *User) DeleteOne(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "User deleted.")
+}
+
+func (rt *User) Login(c echo.Context) error {
+	payload := new(models.ULoginPayload)
+
+	if err := (&echo.DefaultBinder{}).BindBody(c, &payload); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	if payload.Username == "" || payload.Email == "" || payload.Password == "" {
+		return c.JSON(http.StatusBadRequest, "Missing required fields.")
+	}
+
+	checkUser := handlers.GetUserByUsername(rt.Conn, payload)
+
+	if checkUser.Username == "" {
+		return c.JSON(http.StatusBadRequest, "User doesn't exist")
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(checkUser.Password), []byte(payload.Password))
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Incorrect username or password.")
+	}
+
+	user_jwt_payload := utils.UserJwtPayload{
+		Id:       checkUser.ID,
+		Username: checkUser.Username,
+		Email:    checkUser.Email,
+	}
+
+	new_jwttoken, err := utils.CreateJwt(user_jwt_payload)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, new_jwttoken)
 }

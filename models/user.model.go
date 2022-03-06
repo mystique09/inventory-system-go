@@ -17,16 +17,22 @@ type (
 		UpdatedAt time.Time `json:"updated_at"`
 	}
 
-	CreateUserDto struct {
+	UserPayload struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 		Email    string `json:"email"`
 	}
 
+	CreateUserDto struct {
+		UserPayload
+	}
+
 	UpdateUserDto struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Email    string `json:"email"`
+		UserPayload
+	}
+
+	ULoginPayload struct {
+		UserPayload
 	}
 
 	UserResponse struct {

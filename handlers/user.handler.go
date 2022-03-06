@@ -4,6 +4,7 @@ import (
 	"inventory-system/models"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -23,39 +24,39 @@ func GetUser(conn *gorm.DB, id uuid.UUID) models.UserResponse {
 	return result
 }
 
+func GetUserByUsername(conn *gorm.DB, payload *models.ULoginPayload) models.User {
+	var result models.User
+
+	conn.Model(&models.User{}).Where("username = ?", payload.Username).Find(&result)
+	return result
+}
+
 func CreateUser(conn *gorm.DB, payload models.CreateUserDto) error {
 	new_user := models.NewUser(&payload)
+	hashed_password, err := bcrypt.GenerateFromPassword([]byte(new_user.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return err
+	}
+
+	new_user.Password = string(hashed_password)
+
 	if err := conn.Create(&new_user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateUser(conn *gorm.DB, uid uuid.UUID, payload models.UpdateUserDto, field string) error {
+func UpdateUser(conn *gorm.DB, uid uuid.UUID, payload models.UpdateUserDto) error {
 	var user models.User
 
-	switch field {
-	case "username":
-		err := conn.Model(&user).Where("id = ?", uid).Update("username", payload.Username).Error
-		if err != nil {
-			return err
-		}
-	case "password":
-		err := conn.Model(&user).Where("id = ?", uid).Update("password", payload.Password).Error
-
-		if err != nil {
-			return err
-		}
-
-	case "email":
-		err := conn.Model(&user).Where("id = ?", uid).Update("email", payload.Email).Error
-
-		if err != nil {
-			return err
-		}
-
+	if err := conn.Model(&user).Where("id = ?", uid).Updates(models.User{
+		Username: payload.Username,
+		Password: payload.Password,
+		Email:    payload.Email,
+	}).Error; err != nil {
+		return err
 	}
-
 	return nil
 }
 
