@@ -22,20 +22,20 @@ func main() {
 	app := echo.New()
 	app.Use(routes.CustomLogger())
 	app.Use(middleware.Recover())
-	app.Use(routes.AuthMiddleware())
 
 	app.GET("/", MainRoute)
+	app.POST("/auth", user_rt.Login)
+	app.POST("/register", user_rt.CreateOne)
 
-	user_gr := app.Group("/users")
+	user_gr := app.Group("/users", routes.AuthMiddleware())
 	{
 		user_gr.GET("", user_rt.GetAll)
-		user_gr.POST("", user_rt.CreateOne)
 		user_gr.GET("/:id", user_rt.GetOne)
 		user_gr.PUT("/:id", user_rt.UpdateOne)
 		user_gr.DELETE("/:id", user_rt.DeleteOne)
 	}
 
-	product_gr := app.Group("/products")
+	product_gr := app.Group("/products", routes.AuthMiddleware())
 	{
 		product_gr.GET("", product_rt.GetAll)
 		product_gr.POST("", product_rt.CreateOne)
