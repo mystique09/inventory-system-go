@@ -22,6 +22,7 @@ func main() {
 	app := echo.New()
 	app.Use(routes.CustomLogger())
 	app.Use(middleware.Recover())
+	app.Use(routes.AuthMiddleware())
 
 	app.GET("/", MainRoute)
 
