@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"os"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -11,8 +13,9 @@ func CustomLogger() echo.MiddlewareFunc {
 	})
 }
 
-func JwtMiddleware() echo.MiddlewareFunc {
+func AuthMiddleware() echo.MiddlewareFunc {
 	return middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: "",
+		SigningMethod: "HS512",
+		SigningKey:    []byte(os.Getenv("JWT_SECRET")),
 	})
 }
