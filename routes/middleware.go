@@ -19,3 +19,11 @@ func AuthMiddleware() echo.MiddlewareFunc {
 		SigningKey:    []byte(os.Getenv("JWT_SECRET")),
 	})
 }
+
+func CorsMiddleware() echo.MiddlewareFunc {
+	return middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true,
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	})
+}
