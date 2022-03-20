@@ -32,7 +32,8 @@ type (
 	}
 
 	ULoginPayload struct {
-		UserPayload
+		Username string `json:"username"`
+		Password string `json:"password"`
 	}
 
 	UserResponse struct {
