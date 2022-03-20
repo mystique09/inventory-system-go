@@ -1,12 +1,26 @@
 package utils
 
 import (
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	uuid "github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
+
+func CreateCookie(c echo.Context, name string, value string) {
+	cookie := new(http.Cookie)
+	cookie.Name = name
+	cookie.Value = value
+	cookie.Expires = time.Now().Add(24 * 365 * time.Hour) // 1 year
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	//cookie.Secure = true
+
+	c.SetCookie(cookie)
+}
 
 func CreateJwt(payload UserJwtPayload) (string, error) {
 	claims := JwtClaims{
