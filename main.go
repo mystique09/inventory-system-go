@@ -22,6 +22,7 @@ func main() {
 	app := echo.New()
 	app.Use(routes.CustomLogger())
 	app.Use(middleware.Recover())
+	app.Use(routes.CorsMiddleware())
 
 	app.GET("/", MainRoute)
 	app.POST("/auth", user_rt.Login)

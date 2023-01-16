@@ -108,7 +108,7 @@ func (rt *User) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	if payload.Username == "" || payload.Email == "" || payload.Password == "" {
+	if payload.Username == "" || payload.Password == "" {
 		return c.JSON(http.StatusBadRequest, "Missing required fields.")
 	}
 
@@ -135,6 +135,8 @@ func (rt *User) Login(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+
+	utils.CreateCookie(c, "auth", new_jwttoken)
 
 	return c.JSON(http.StatusOK, new_jwttoken)
 }
